@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"time"
+	"fmt"
 
 	"github.com/deepch/vdk/format/rtspv2"
 )
@@ -66,6 +67,7 @@ func RTSPWorker(name, url string, OnDemand, DisableAudio, Debug bool) error {
 		case <-keyTest.C:
 			return ErrorStreamExitNoVideoOnStream
 		case signals := <-RTSPClient.Signals:
+			fmt.Println("Got a signal", RTSPClient.Signals)
 			switch signals {
 			case rtspv2.SignalCodecUpdate:
 				Config.coAd(name, RTSPClient.CodecData)

@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"time"
+	"fmt"
 
 	"github.com/deepch/vdk/av"
 
@@ -23,7 +24,7 @@ func serveHTTP() {
 
 	router := gin.Default()
 	router.Use(CORSMiddleware())
-	
+
 	if _, err := os.Stat("./web"); !os.IsNotExist(err) {
 		router.LoadHTMLGlob("web/templates/*")
 		router.GET("/", HTTPAPIServerIndex)
@@ -130,7 +131,7 @@ func HTTPAPIServerStreamWebRTC(c *gin.Context) {
 		defer Config.clDe(c.PostForm("suuid"), cid)
 		defer muxerWebRTC.Close()
 		var videoStart bool
-		noVideo := time.NewTimer(10 * time.Second)
+		noVideo := time.NewTimer(20 * time.Second)
 		for {
 			select {
 			case <-noVideo.C:
@@ -138,7 +139,8 @@ func HTTPAPIServerStreamWebRTC(c *gin.Context) {
 				return
 			case pck := <-ch:
 				if pck.IsKeyFrame || AudioOnly {
-					noVideo.Reset(10 * time.Second)
+					fmt.Println("got a keyframe")
+					noVideo.Reset(20 * time.Second)
 					videoStart = true
 				}
 				if !videoStart && !AudioOnly {
